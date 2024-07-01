@@ -5,9 +5,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
+import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @org.springframework.context.annotation.Configuration
 @ComponentScan("ru.sotnikov")
@@ -28,6 +31,10 @@ public class Configuration {
         return terminals;
     }
 
+    @Bean("tickets")
+    public Map<Integer, Ticket> tickets(){
+        return new HashMap<>();
+    }
 
     @Bean
     public RestTemplate restTemplate(){
