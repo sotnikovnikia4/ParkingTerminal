@@ -76,7 +76,17 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
     }
 
     private void onTakingFineTicket(ActionEvent actionEvent) {
-
+        new Thread(() -> {
+            try {
+                Ticket ticket = backendLogic.getFineTicket();
+                askToPayLabel.setText("Выдан штрафной талон " + ticket);
+                askToTakeFineTicketButton.setVisible(false);
+                ticketsBox.setEnabled(false);
+                giveTicketButton.setVisible(false);
+                Thread.sleep(2000);
+                defaultState();
+            } catch (InterruptedException ignored) {}
+        }).start();
     }
 
     private void onGivingTicket(ActionEvent actionEvent) {

@@ -42,6 +42,14 @@ public class BackendLogic {
     }
 
     public int getTimeOfLeaving() {
-        return 0;
+        return 10;
+    }
+
+    public int getFineCost() {
+        return 2500;
+    }
+
+    public Ticket getFineTicket() {
+        return takeTicket();
     }
 }
