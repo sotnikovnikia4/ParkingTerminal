@@ -13,6 +13,11 @@ public class Ticket {
     private LocalDateTime checkIn;
 
     public String toString(){
-        return String.format("Талон %d: %s", number, checkIn.toString());
+        return String.format("%d: %d-%d-%d, %d:%s", number,
+                checkIn.getYear(),
+                checkIn.getMonthValue(),
+                checkIn.getDayOfMonth(),
+                checkIn.getHour(),
+                checkIn.getMinute() < 10 ? "0" + checkIn.getMinute() : checkIn.getMinute() + "");
     }
 }

@@ -4,34 +4,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.sotnikov.api.BackendLogic;
+import ru.sotnikov.util.TerminalException;
 import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Map;
 
 @Component("terminal2")
 public class PayingTerminalPanel extends AbstractTerminalPanel {
-    private final Label askToPayLabel;
+    private final JLabel askToPayLabel;
     private final Button askToTakeFineTicketButton, giveTicketButton, payButton;
     private final JComboBox<Ticket> ticketsBox;
 
     private final BackendLogic backendLogic;
-    private final Map<Integer, Ticket> tickets;
+
+    private int costOfParking;
+    private Thread waitingPaymentThread;
 
     @Autowired
     public PayingTerminalPanel(ApplicationContext applicationContext){
         super("Терминал 2", applicationContext);
 
         backendLogic = applicationContext.getBean(BackendLogic.class);
-        tickets = applicationContext.getBean("tickets", Map.class);
 
-        askToPayLabel = new Label();
-        askToPayLabel.setSize(new Dimension(getWidth() / 2, getIndent() * 2));
+        askToPayLabel = new JLabel();
+        askToPayLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 4));
         askToPayLabel.setFont(getFontOfLabels());
         askToPayLabel.setText("Приложите талончик");
-        askToPayLabel.setAlignment(Label.CENTER);
+        askToPayLabel.setHorizontalAlignment(JLabel.CENTER);
+        askToPayLabel.setVerticalAlignment(JLabel.CENTER);
 
         askToTakeFineTicketButton = new Button();
         askToTakeFineTicketButton.setSize(160, 50);
@@ -69,6 +71,8 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
         add(giveTicketButton);
         add(ticketsBox);
         add(payButton);
+
+        defaultState();
     }
 
     private void onTakingFineTicket(ActionEvent actionEvent) {
@@ -76,10 +80,60 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
     }
 
     private void onGivingTicket(ActionEvent actionEvent) {
+        try{
+            askToPayLabel.setText("Производится расчет стоимости оплаты, подождите...");
+            giveTicketButton.setVisible(false);
+            askToTakeFineTicketButton.setVisible(false);
+            costOfParking = backendLogic.getSumOfPayment((Ticket)ticketsBox.getSelectedItem());
+            askToPayLabel.setText("<html>К оплате: <br>" + costOfParking + " руб.</html>");
+            payButton.setVisible(true);
+            ticketsBox.setEnabled(false);
 
+            waitingPaymentThread = new Thread(() -> {
+                try {
+                    Thread.sleep(10000);
+                    defaultState();
+                } catch (InterruptedException ignored) {}
+            });
+            waitingPaymentThread.start();
+        }
+        catch(TerminalException e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            defaultState();
+        }
     }
 
     private void onPaying(ActionEvent actionEvent) {
+        new Thread(() -> {
+            try{
+                waitingPaymentThread.interrupt();
+                askToPayLabel.setText("Обработка платежа, подождите...");
+                Thread.sleep(2000);
+                backendLogic.pay(costOfParking, (Ticket)ticketsBox.getSelectedItem(), null);
+                askToPayLabel.setText(
+                        "<html>Талон " +
+                                (Ticket)ticketsBox.getSelectedItem() +
+                                " оплачен,<br/> выезд возможен в течение " + backendLogic.getTimeOfLeaving() + " минут</html>"
+                );
+                payButton.setVisible(false);
+                Thread.sleep(5000);
+                defaultState();
+            }
+            catch(TerminalException e){
+                JOptionPane.showMessageDialog(null, e.getMessage());
+                defaultState();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
 
+    public void defaultState(){
+        askToPayLabel.setText("Приложите талончик");
+        askToTakeFineTicketButton.setVisible(true);
+        giveTicketButton.setVisible(true);
+        ticketsBox.setEnabled(true);
+        payButton.setVisible(false);
+        costOfParking = 0;
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.sotnikov.api.BackendLogic;
 import ru.sotnikov.util.TerminalException;
+import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +26,7 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         backendLogic = applicationContext.getBean(BackendLogic.class);
 
         takeTicketLabel = new Label();
-        takeTicketLabel.setSize(new Dimension(getWidth() / 2, getIndent() * 2));
+        takeTicketLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 2));
         takeTicketLabel.setFont(getFontOfLabels());
         takeTicketLabel.setText("Возьмите талон");
         takeTicketLabel.setAlignment(Label.CENTER);
@@ -67,10 +68,10 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
 
     private void onTakeTicket(ActionEvent e){
         try{
-            backendLogic.takeTicket();
+            Ticket ticket = backendLogic.takeTicket();
 
             takeTicketButton.setVisible(false);
-            takeTicketLabel.setText("Проезжайте");
+            takeTicketLabel.setText("Выдан талон " + ticket + ", проезжайте");
             stateOfGateLabel.setText("Шлагбаум открыт");
             driveToParkingButton.setVisible(true);
         }catch(TerminalException ex){

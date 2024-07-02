@@ -25,17 +25,17 @@ import java.util.Map;
 public class Configuration {
     private final ApplicationContext applicationContext;
 
-    @Value("${heightOfTerminal}")
-    private int heightOfTerminal;
-    @Value("${indent}")
-    private int indent;
+    private final int indent;
 
-    private int heightOfButton = 50, yOfGiveTicketButton = heightOfTerminal - heightOfButton - indent;
+    private final int heightOfButton;
+    private final int yOfGiveTicketButton;
 
     @Autowired
-    public Configuration(ApplicationContext applicationContext){
+    public Configuration(ApplicationContext applicationContext, @Value("${indent}") int indent, @Value("${heightOfTerminal}") int heightOfTerminal){
         this.applicationContext = applicationContext;
-
+        heightOfButton = 50;
+        this.indent = indent;
+        yOfGiveTicketButton = heightOfTerminal - heightOfButton - indent;
     }
 
     @Bean("terminals")
@@ -49,12 +49,6 @@ public class Configuration {
         return terminals;
     }
 
-    @Bean("tickets")
-    @Scope("singleton")
-    public Map<Integer, Ticket> tickets(){
-        return new HashMap<>();
-    }
-
     @Bean("fontOfLabels")
     public Font font(){
         return new Font(Font.SANS_SERIF, Font.PLAIN, indent);
@@ -66,7 +60,7 @@ public class Configuration {
             @Qualifier("fontOfLabels") Font font){
 
         JComboBox<Ticket> ticketsBox = new JComboBox<>();
-        ticketsBox.setSize(170, 50);
+        ticketsBox.setSize(250, 50);
         ticketsBox.setFont(font);
         ticketsBox.setEditable(true);
         ticketsBox.setLocation(
@@ -83,15 +77,14 @@ public class Configuration {
             @Qualifier("fontOfLabels") Font font
     ){
         Button giveTicketButton = new Button();
-        giveTicketButton.setSize(170, heightOfButton);
+        giveTicketButton.setSize(250, heightOfButton);
         giveTicketButton.setFont(font);
         giveTicketButton.setLabel("Приложить талон");
 
         giveTicketButton.setLocation(
                 properties().indent + 1,
-                properties().heightOfTerminal - giveTicketButton.getHeight() -  properties().indent
+                yOfGiveTicketButton
         );
-
         return giveTicketButton;
     }
 
@@ -106,7 +99,7 @@ public class Configuration {
     }
 
     @Getter
-    public class Properties{
+    public static class Properties{
         @Value("${indent}")
         private int indent;
         @Value("${heightOfScreen}")
