@@ -30,15 +30,12 @@ public class MainPanel extends JPanel {
 
 
         this.terminals = applicationContext.getBean("terminals", JPanel[].class);
-        this.currentTerminal = 0;
+        this.currentTerminal = 1;
 
-        Arrays.stream(terminals).forEach(e -> {
-            add(e);
-            e.setVisible(false);
-        });
+        Arrays.stream(terminals).forEach(this::add);
         add(buttonNext);
         add(buttonPrev);
-        terminals[0].setVisible(true);
+        terminals[currentTerminal].setVisible(true);
 
         this.setLayout(null);
 

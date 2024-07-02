@@ -1,4 +1,4 @@
-package ru.sotnikov.components.panels;
+package ru.sotnikov.components.terminals;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,6 +34,7 @@ public abstract class AbstractTerminalPanel extends JPanel {
         add(nameOfTerminalLabel);
 
         setLayout(null);
+        setVisible(false);
     }
 
     @Override

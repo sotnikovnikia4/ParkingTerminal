@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.client.RestTemplate;
 import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +32,7 @@ public class Configuration {
     }
 
     @Bean("tickets")
+    @Scope("singleton")
     public Map<Integer, Ticket> tickets(){
         return new HashMap<>();
     }

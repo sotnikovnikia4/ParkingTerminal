@@ -1,4 +1,4 @@
-package ru.sotnikov.components.panels;
+package ru.sotnikov.components.terminals;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -12,11 +12,11 @@ import java.awt.event.ActionEvent;
 
 @Component("terminal1")
 public class EnteringTerminalPanel extends AbstractTerminalPanel {
-    private Label takeTicketLabel, stateOfGateLabel;
+    private final Label takeTicketLabel, stateOfGateLabel;
 
-    private Button takeTicketButton, driveToParkingButton;
+    private final Button takeTicketButton, driveToParkingButton;
 
-    private BackendLogic backendLogic;
+    private final BackendLogic backendLogic;
 
     @Autowired
     public EnteringTerminalPanel(ApplicationContext applicationContext){
@@ -47,7 +47,7 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         driveToParkingButton.setFont(getFontOfLabels());
         driveToParkingButton.setLabel("Заехать");
         driveToParkingButton.addActionListener(this::onDrivingToParing);
-
+        driveToParkingButton.setVisible(false);
 
         takeTicketLabel.setLocation((getWidth() - takeTicketLabel.getWidth()) / 2, 50);
         stateOfGateLabel.setLocation((getWidth() - stateOfGateLabel.getWidth()) / 2, getIndent() + getHeightOfScreen() - stateOfGateLabel.getHeight() - 40);
@@ -72,6 +72,7 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
             takeTicketButton.setVisible(false);
             takeTicketLabel.setText("Проезжайте");
             stateOfGateLabel.setText("Шлагбаум открыт");
+            driveToParkingButton.setVisible(true);
         }catch(TerminalException ex){
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
@@ -83,5 +84,6 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         takeTicketButton.setVisible(true);
         takeTicketLabel.setText("Возьмите талон");
         stateOfGateLabel.setText("Шлагбаум закрыт");
+        driveToParkingButton.setVisible(false);
     }
 }
