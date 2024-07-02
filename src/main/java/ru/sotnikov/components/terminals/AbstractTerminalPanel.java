@@ -2,6 +2,8 @@ package ru.sotnikov.components.terminals;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.springframework.context.ApplicationContext;
+import ru.sotnikov.configuration.Configuration;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,13 +18,14 @@ public abstract class AbstractTerminalPanel extends JPanel {
 
     private final Label nameOfTerminalLabel;
 
-    protected AbstractTerminalPanel(String nameOfTerminal){
-        indent = 20;
-        heightOfScreen = 400;
+    protected AbstractTerminalPanel(String nameOfTerminal, ApplicationContext applicationContext){
+        Configuration.Properties properties = applicationContext.getBean("properties", Configuration.Properties.class);
+        indent = properties.getIndent();
+        heightOfScreen = properties.getHeightOfScreen();
 
-        setBounds(51, 0, 700 ,600);
+        setBounds(51, 0, properties.getWidthOfTerminal(),properties.getHeightOfTerminal());
 
-        fontOfLabels = new Font(Font.SANS_SERIF, Font.PLAIN, indent);
+        fontOfLabels = applicationContext.getBean("fontOfLabels", Font.class);
 
         this.nameOfTerminalLabel = new Label();
         this.nameOfTerminalLabel.setSize(new Dimension(110, indent - 1));

@@ -3,6 +3,7 @@ package ru.sotnikov.components.window;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import ru.sotnikov.configuration.Configuration;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +19,8 @@ public class MainPanel extends JPanel {
 
     @Autowired
     public MainPanel(ApplicationContext applicationContext){
-        Dimension sizeOfPanel = new Dimension(800, 600);
+        Configuration.Properties properties = applicationContext.getBean("properties", Configuration.Properties.class);
+        Dimension sizeOfPanel = new Dimension(properties.getWidthOfWindow(), properties.getHeightOfWindow());
 
         setPreferredSize(sizeOfPanel);
         setSize(sizeOfPanel);

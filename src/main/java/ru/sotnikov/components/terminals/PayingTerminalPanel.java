@@ -4,23 +4,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.sotnikov.api.BackendLogic;
+import ru.sotnikov.util.Ticket;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Map;
 
 @Component("terminal2")
 public class PayingTerminalPanel extends AbstractTerminalPanel {
     private final Label askToPayLabel;
-
-    private final Button askToTakeFineTicketButton, giveTicketButton, chooseTicketButton, payButton;
+    private final Button askToTakeFineTicketButton, giveTicketButton, payButton;
+    private final JComboBox<Ticket> ticketsBox;
 
     private final BackendLogic backendLogic;
+    private final Map<Integer, Ticket> tickets;
 
     @Autowired
     public PayingTerminalPanel(ApplicationContext applicationContext){
-        super("Терминал 2");
+        super("Терминал 2", applicationContext);
 
         backendLogic = applicationContext.getBean(BackendLogic.class);
+        tickets = applicationContext.getBean("tickets", Map.class);
 
         askToPayLabel = new Label();
         askToPayLabel.setSize(new Dimension(getWidth() / 2, getIndent() * 2));
@@ -34,24 +39,17 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
         askToTakeFineTicketButton.setLabel("Потерял талон");
         askToTakeFineTicketButton.addActionListener(this::onTakingFineTicket);
 
-        giveTicketButton = new Button();
-        giveTicketButton.setSize(170, 50);
-        giveTicketButton.setFont(getFontOfLabels());
-        giveTicketButton.setLabel("Приложить талон");
+        giveTicketButton = applicationContext.getBean("giveTicketButton", Button.class);
         giveTicketButton.addActionListener(this::onGivingTicket);
-
-        chooseTicketButton = new Button();
-        chooseTicketButton.setSize(170, 50);
-        chooseTicketButton.setFont(getFontOfLabels());
-        chooseTicketButton.setLabel("Выбрать талон");
-        chooseTicketButton.addActionListener(this::onChoosingTicket);
 
         payButton = new Button();
         payButton.setSize(300, 50);
         payButton.setFont(getFontOfLabels());
         payButton.setLabel("Приложить карту для оплаты");
         payButton.addActionListener(this::onPaying);
+        payButton.setVisible(false);
 
+        ticketsBox = applicationContext.getBean("ticketsBox", JComboBox.class);
 
         askToPayLabel.setLocation(
                 (getWidth() - askToPayLabel.getWidth()) / 2,
@@ -61,14 +59,6 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
                 (getWidth() - askToTakeFineTicketButton.getWidth()) / 2,
                     askToPayLabel.getY() + askToPayLabel.getHeight() + getIndent() * 5
         );
-        giveTicketButton.setLocation(
-                getIndent() + 1,
-                getHeight() - giveTicketButton.getHeight() - getIndent()
-        );
-        chooseTicketButton.setLocation(
-                getIndent() + 1,
-                giveTicketButton.getY() - getIndent() - chooseTicketButton.getHeight()
-        );
         payButton.setLocation(
                 getWidth() - getIndent() - payButton.getWidth(),
                 getHeight() - getIndent() - payButton.getHeight()
@@ -77,7 +67,7 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
         add(askToPayLabel);
         add(askToTakeFineTicketButton);
         add(giveTicketButton);
-        add(chooseTicketButton);
+        add(ticketsBox);
         add(payButton);
     }
 
@@ -87,9 +77,6 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
 
     private void onGivingTicket(ActionEvent actionEvent) {
 
-    }
-
-    private void onChoosingTicket(ActionEvent actionEvent) {
     }
 
     private void onPaying(ActionEvent actionEvent) {

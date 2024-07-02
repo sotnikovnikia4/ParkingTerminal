@@ -20,7 +20,7 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
 
     @Autowired
     public EnteringTerminalPanel(ApplicationContext applicationContext){
-        super("Терминал 1");
+        super("Терминал 1", applicationContext);
 
         backendLogic = applicationContext.getBean(BackendLogic.class);
 

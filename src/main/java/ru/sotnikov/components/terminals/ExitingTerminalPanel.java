@@ -9,7 +9,7 @@ public class ExitingTerminalPanel extends AbstractTerminalPanel {
 
     @Autowired
     public ExitingTerminalPanel(ApplicationContext applicationContext){
-        super("Терминал 3");
+        super("Терминал 3", applicationContext);
 
 
     }
