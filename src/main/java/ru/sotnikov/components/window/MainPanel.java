@@ -1,6 +1,7 @@
 package ru.sotnikov.components.window;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.sotnikov.configuration.Configuration;
@@ -32,7 +33,7 @@ public class MainPanel extends JPanel {
 
 
         this.terminals = applicationContext.getBean("terminals", JPanel[].class);
-        this.currentTerminal = 1;
+        this.currentTerminal = properties.getStartTerminal() - 1;
 
         Arrays.stream(terminals).forEach(this::add);
         add(buttonNext);

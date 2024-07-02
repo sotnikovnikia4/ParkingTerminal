@@ -1,5 +1,6 @@
 package ru.sotnikov.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +99,11 @@ public class Configuration {
         return new Properties();
     }
 
+    @Bean
+    public ObjectMapper objectMapper(){
+        return new ObjectMapper();
+    }
+
     @Getter
     public static class Properties{
         @Value("${indent}")
@@ -112,5 +118,9 @@ public class Configuration {
         private int heightOfTerminal;
         @Value("${widthOfTerminal}")
         private int widthOfTerminal;
+        @Value("${startTerminal}")
+        private int startTerminal;
+        @Value("${urlBackend}")
+        private String urlBackend;
     }
 }
