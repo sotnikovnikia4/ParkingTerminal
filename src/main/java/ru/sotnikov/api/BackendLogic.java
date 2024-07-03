@@ -40,7 +40,6 @@ public class BackendLogic {
         try{
             HttpEntity<Object> httpEntity = new HttpEntity<>("{}");
             String json = restTemplate.postForObject(url + "/ticket/enter", httpEntity, String.class);
-            System.out.println(boxes.size());
             return parseTicketFromJsonNode(objectMapper.readTree(json));
         }
         catch (JacksonException | RestClientException e) {
@@ -176,6 +175,10 @@ public class BackendLogic {
 
     public void checkPaymentOtherwiseThrowException(Ticket ticket) throws TerminalException{
         try{
+            if(ticket == null){
+                throw new TerminalException("Выберете талон!");
+            }
+
             Boolean response = restTemplate.postForObject(url + "/ticket/exit/" + ticket.getNumber(), "{}", Boolean.class);
 
             if(response == null || !response){
