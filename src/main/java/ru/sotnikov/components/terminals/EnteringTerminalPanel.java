@@ -17,13 +17,9 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
 
     private final Button takeTicketButton, driveToParkingButton;
 
-    private final BackendLogic backendLogic;
-
     @Autowired
     public EnteringTerminalPanel(ApplicationContext applicationContext){
         super("Терминал 1", applicationContext);
-
-        backendLogic = applicationContext.getBean(BackendLogic.class);
 
         takeTicketLabel = new Label();
         takeTicketLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 2));
@@ -70,9 +66,9 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
 
     private void onTakeTicket(ActionEvent e){
         try{
-            Ticket ticket = backendLogic.takeTicket();
+            Ticket ticket = getBackendLogic().takeTicket();
 
-            getTicketsBox().insertItemAt(ticket, 0);
+            getBackendLogic().addTicketToBox(ticket);
 
             takeTicketButton.setVisible(false);
             takeTicketLabel.setText("Выдан талон " + ticket + ", проезжайте");

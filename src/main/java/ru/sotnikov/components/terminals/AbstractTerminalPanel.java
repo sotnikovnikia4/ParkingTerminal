@@ -3,6 +3,7 @@ package ru.sotnikov.components.terminals;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.context.ApplicationContext;
+import ru.sotnikov.api.BackendLogic;
 import ru.sotnikov.configuration.Configuration;
 import ru.sotnikov.util.Ticket;
 
@@ -21,12 +22,15 @@ public abstract class AbstractTerminalPanel extends JPanel {
 
     private final JComboBox<Ticket> ticketsBox;
 
+    private final BackendLogic backendLogic;
+
     protected AbstractTerminalPanel(String nameOfTerminal, ApplicationContext applicationContext){
         Configuration.Properties properties = applicationContext.getBean("properties", Configuration.Properties.class);
         indent = properties.getIndent();
         heightOfScreen = properties.getHeightOfScreen();
 
         ticketsBox = applicationContext.getBean("ticketsBox", JComboBox.class);
+        backendLogic = applicationContext.getBean(BackendLogic.class);
 
         setBounds(51, 0, properties.getWidthOfTerminal(),properties.getHeightOfTerminal());
 
@@ -42,8 +46,12 @@ public abstract class AbstractTerminalPanel extends JPanel {
         add(nameOfTerminalLabel);
         add(ticketsBox);
 
+        ticketsBox.setVisible(false);
+
         setLayout(null);
         setVisible(false);
+
+        backendLogic.loadAllTickets(ticketsBox);
     }
 
     @Override

@@ -17,7 +17,9 @@ import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @org.springframework.context.annotation.Configuration
@@ -31,12 +33,15 @@ public class Configuration {
     private final int heightOfButton;
     private final int yOfGiveTicketButton;
 
+    private final List<JComboBox<Ticket>> boxes;
+
     @Autowired
     public Configuration(ApplicationContext applicationContext, @Value("${indent}") int indent, @Value("${heightOfTerminal}") int heightOfTerminal){
         this.applicationContext = applicationContext;
         heightOfButton = 50;
         this.indent = indent;
         yOfGiveTicketButton = heightOfTerminal - heightOfButton - indent;
+        this.boxes = new ArrayList<>();
     }
 
     @Bean("terminals")
@@ -56,7 +61,7 @@ public class Configuration {
     }
 
     @Bean("ticketsBox")
-    @Scope("singleton")
+    @Scope("prototype")
     public JComboBox<Ticket> ticketsBox(
             @Qualifier("fontOfLabels") Font font){
 
@@ -69,7 +74,16 @@ public class Configuration {
                 yOfGiveTicketButton -  properties().indent - ticketsBox.getHeight()
         );
 
+        System.out.println(123);
+
+        boxes.add(ticketsBox);
+
         return ticketsBox;
+    }
+
+    @Bean("boxes")
+    public List<JComboBox<Ticket>> getBoxes(){
+        return boxes;
     }
 
     @Bean("giveTicketButton")

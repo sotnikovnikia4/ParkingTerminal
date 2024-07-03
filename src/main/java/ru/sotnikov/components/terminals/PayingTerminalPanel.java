@@ -16,16 +16,12 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
     private final JLabel askToPayLabel;
     private final Button askToTakeFineTicketButton, giveTicketButton, payButton;
 
-    private final BackendLogic backendLogic;
-
     private int costOfParking;
     private Thread waitingPaymentThread;
 
     @Autowired
     public PayingTerminalPanel(ApplicationContext applicationContext){
         super("Терминал 2", applicationContext);
-
-        backendLogic = applicationContext.getBean(BackendLogic.class);
 
         askToPayLabel = new JLabel();
         askToPayLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 4));
@@ -74,8 +70,8 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
     private void onTakingFineTicket(ActionEvent actionEvent) {
         new Thread(() -> {
             try {
-                Ticket ticket = backendLogic.getFineTicket();
-                getTicketsBox().insertItemAt(ticket, 0);
+                Ticket ticket = getBackendLogic().getFineTicket();
+                getBackendLogic().addTicketToBox(ticket);
 
                 askToPayLabel.setText("Выдан штрафной талон " + ticket);
                 askToTakeFineTicketButton.setVisible(false);
@@ -92,11 +88,11 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
             askToPayLabel.setText("Производится расчет стоимости оплаты, подождите...");
             giveTicketButton.setVisible(false);
             askToTakeFineTicketButton.setVisible(false);
-            costOfParking = backendLogic.getSumOfPayment((Ticket)getTicketsBox().getSelectedItem());
+            costOfParking = getBackendLogic().getSumOfPayment((Ticket)getTicketsBox().getSelectedItem());
             getTicketsBox().setEnabled(false);
 
             if(costOfParking == 0){
-                askToPayLabel.setText("<html><p style=\"text-align:center\">Время бесплатной парковки " + backendLogic.getFreeTime() + " мин.,<br> оплата не требуется</p></html>");
+                askToPayLabel.setText("<html><p style=\"text-align:center\">Время бесплатной парковки " + getBackendLogic().getFreeTime() + " мин.,<br> оплата не требуется</p></html>");
                 waitingPaymentThread = new Thread(() -> {
                     try {
                         Thread.sleep(3000);
@@ -134,11 +130,11 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
                 payButton.setVisible(false);
                 askToPayLabel.setText("Обработка платежа, подождите...");
                 //Thread.sleep(2000);
-                backendLogic.pay(costOfParking, (Ticket)getTicketsBox().getSelectedItem(), "null");
+                getBackendLogic().pay(costOfParking, (Ticket)getTicketsBox().getSelectedItem(), "null");
                 askToPayLabel.setText(
                         "<html>Талон " +
                                 (Ticket)getTicketsBox().getSelectedItem() +
-                                " оплачен,<br/> выезд возможен в течение " + backendLogic.getTimeOfLeaving() + " минут</html>"
+                                " оплачен,<br/> выезд возможен в течение " + getBackendLogic().getTimeOfLeaving() + " минут</html>"
                 );
                 Thread.sleep(5000);
                 defaultState();
@@ -154,7 +150,7 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
 
     public void defaultState(){
         try{
-            askToPayLabel.setText("<html><p style=\"text-align:center\">Приложите талончик<br>За утерю талончика штраф " + backendLogic.getFineCost() +" рублей</p></html>");
+            askToPayLabel.setText("<html><p style=\"text-align:center\">Приложите талончик<br>За утерю талончика штраф " + getBackendLogic().getFineCost() +" рублей</p></html>");
         }
         catch (TerminalException e){
             askToPayLabel.setText("Отсутствует подключение...");
@@ -165,5 +161,6 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
         getTicketsBox().setEnabled(true);
         payButton.setVisible(false);
         costOfParking = 0;
+        getTicketsBox().setVisible(true);
     }
 }
