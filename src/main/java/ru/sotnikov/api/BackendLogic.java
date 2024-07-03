@@ -28,8 +28,8 @@ public class BackendLogic {
     private final String url;
 
     @Autowired
-    public BackendLogic(List<JComboBox<Ticket>> boxes, RestTemplate restTemplate, Configuration.Properties properties, ObjectMapper objectMapper) {
-        this.boxes = boxes;
+    public BackendLogic(RestTemplate restTemplate, Configuration.Properties properties, ObjectMapper objectMapper) {
+        this.boxes = Configuration.boxes;
         this.restTemplate = restTemplate;
 
         url = properties.getUrlBackend();
@@ -40,13 +40,12 @@ public class BackendLogic {
         try{
             HttpEntity<Object> httpEntity = new HttpEntity<>("{}");
             String json = restTemplate.postForObject(url + "/ticket/enter", httpEntity, String.class);
-
+            System.out.println(boxes.size());
             return parseTicketFromJsonNode(objectMapper.readTree(json));
         }
         catch (JacksonException | RestClientException e) {
             throw new TerminalException(e.getMessage());
         }
-
     }
 
     public int getSumOfPayment(Ticket ticket) {
@@ -68,7 +67,7 @@ public class BackendLogic {
 
             Boolean response = restTemplate.postForObject(url + "/ticket/pay", entity, Boolean.class);
             if(response == null || !response){
-                throw new TerminalException("Оплата прошла неуспешно");
+                throw new TerminalException("Оплата не прошла");
             }
 
             refreshTicket(ticket);
@@ -79,14 +78,18 @@ public class BackendLogic {
     }
 
     private void refreshTicket(Ticket ticket){
-        removeTicketFromBox(ticket);
-
         try{
             String json = restTemplate.getForObject(url + "/ticket/"+ticket.getNumber(), String.class);
             JsonNode jsonNode = objectMapper.readTree(json);
             ticket = parseTicketFromJsonNode(jsonNode);
 
-            addTicketToBox(ticket);
+            for(JComboBox<Ticket> box : boxes){
+                for(int i = 0; i < box.getItemCount(); i++){
+                    if(box.getItemAt(i).getNumber() == ticket.getNumber()){
+                        box.getItemAt(i).setCheckIn(ticket.getCheckIn());
+                    }
+                }
+            }
         }
         catch(NullPointerException | RestClientException | JacksonException e){
             throw new TerminalException(e.getMessage());
@@ -117,7 +120,7 @@ public class BackendLogic {
         return getIntegerFromUrl("/ticket/free-time");
     }
 
-    public void loadAllTickets(JComboBox<Ticket> box) throws TerminalException{
+    public void loadAllTickets(JComboBox<Ticket> box){
         try{
             String json = restTemplate.getForObject(url + "/ticket", String.class);
 
@@ -125,6 +128,7 @@ public class BackendLogic {
             for(int i = 0; i < node.size(); i++){
                 box.insertItemAt(parseTicketFromJsonNode(node.get(i)), 0);
             }
+            box.setSelectedItem(box.getItemAt(0));
         }
         catch(RuntimeException | JacksonException ignored){
 
@@ -134,11 +138,22 @@ public class BackendLogic {
     public void addTicketToBox(Ticket ticket){
         for(JComboBox<Ticket> box : boxes){
             box.insertItemAt(ticket, 0);
+            box.setSelectedItem(ticket);
+            System.out.println("added");
         }
+
     }
     public void removeTicketFromBox(Ticket ticket){
         for(JComboBox<Ticket> box : boxes){
-            box.removeItem(ticket);
+            int i = 0;
+            for(; i < box.getItemCount(); i++){
+                if(box.getItemAt(i).getNumber() == ticket.getNumber()){
+                    box.removeItemAt(i);
+                    box.setSelectedItem(null);
+                    break;
+                }
+            }
+            System.out.println("removed");
         }
     }
 
@@ -155,6 +170,18 @@ public class BackendLogic {
             return Objects.requireNonNull(restTemplate.getForObject(this.url + url, Integer.class));
         }
         catch (NullPointerException | RestClientException e){
+            throw new TerminalException(e.getMessage());
+        }
+    }
+
+    public void checkPaymentOtherwiseThrowException(Ticket ticket) throws TerminalException{
+        try{
+            Boolean response = restTemplate.postForObject(url + "/ticket/exit/" + ticket.getNumber(), "{}", Boolean.class);
+
+            if(response == null || !response){
+                throw new TerminalException("<html>Талон не оплачен, пожалуйста,<br/> пройдите к терминалу 2</html>");
+            }
+        }catch(NullPointerException | RestClientException e){
             throw new TerminalException(e.getMessage());
         }
     }

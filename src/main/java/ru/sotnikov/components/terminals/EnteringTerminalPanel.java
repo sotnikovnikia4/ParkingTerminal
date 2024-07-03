@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
 
 @Component("terminal1")
 public class EnteringTerminalPanel extends AbstractTerminalPanel {
-    private final Label takeTicketLabel, stateOfGateLabel;
+    private final Label stateOfGateLabel;
 
     private final Button takeTicketButton, driveToParkingButton;
 
@@ -21,11 +21,7 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
     public EnteringTerminalPanel(ApplicationContext applicationContext){
         super("Терминал 1", applicationContext);
 
-        takeTicketLabel = new Label();
-        takeTicketLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 2));
-        takeTicketLabel.setFont(getFontOfLabels());
-        takeTicketLabel.setText("Возьмите талон");
-        takeTicketLabel.setAlignment(Label.CENTER);
+        getMainLabel().setText("Возьмите талон");
 
         stateOfGateLabel = new Label();
         stateOfGateLabel.setSize(new Dimension(getWidth() / 2, getIndent() * 2));
@@ -43,20 +39,18 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         driveToParkingButton.setSize(160, 50);
         driveToParkingButton.setFont(getFontOfLabels());
         driveToParkingButton.setLabel("Заехать");
-        driveToParkingButton.addActionListener(this::onDrivingToParing);
+        driveToParkingButton.addActionListener(this::onDrivingToParking);
         driveToParkingButton.setVisible(false);
 
-        takeTicketLabel.setLocation((getWidth() - takeTicketLabel.getWidth()) / 2, 50);
         stateOfGateLabel.setLocation((getWidth() - stateOfGateLabel.getWidth()) / 2, getIndent() + getHeightOfScreen() - stateOfGateLabel.getHeight() - 40);
         takeTicketButton.setLocation(
                 (getWidth() - takeTicketButton.getWidth()) / 2,
-                takeTicketLabel.getY() + takeTicketLabel.getHeight() + 1 + (stateOfGateLabel.getY() - (takeTicketLabel.getY() + takeTicketLabel.getHeight() + 1) - takeTicketButton.getHeight()) / 2
+                getMainLabel().getY() + getMainLabel().getHeight() + 1 + (stateOfGateLabel.getY() - (getMainLabel().getY() + getMainLabel().getHeight() + 1) - takeTicketButton.getHeight()) / 2
         );
         driveToParkingButton.setLocation(
                 (getWidth() - driveToParkingButton.getWidth()) / 2,
                 getHeight() - driveToParkingButton.getHeight() - 20
         );
-        add(takeTicketLabel);
         add(stateOfGateLabel);
         add(takeTicketButton);
         add(driveToParkingButton);
@@ -71,23 +65,22 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
             getBackendLogic().addTicketToBox(ticket);
 
             takeTicketButton.setVisible(false);
-            takeTicketLabel.setText("Выдан талон " + ticket + ", проезжайте");
+            getMainLabel().setText("Выдан талон " + ticket + ", проезжайте");
             stateOfGateLabel.setText("Шлагбаум открыт");
             driveToParkingButton.setVisible(true);
         }catch(TerminalException ex){
             JOptionPane.showMessageDialog(null, ex.getMessage());
+            defaultState();
         }
-
-
     }
 
-    private void onDrivingToParing(ActionEvent e){
+    private void onDrivingToParking(ActionEvent e){
         defaultState();
     }
 
     private void defaultState(){
         takeTicketButton.setVisible(true);
-        takeTicketLabel.setText("Возьмите талон");
+        getMainLabel().setText("Возьмите талон");
         stateOfGateLabel.setText("Шлагбаум закрыт");
         driveToParkingButton.setVisible(false);
     }

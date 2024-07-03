@@ -18,11 +18,13 @@ public abstract class AbstractTerminalPanel extends JPanel {
 
     private final Font fontOfLabels;
 
-    private final Label nameOfTerminalLabel;
+    private final JLabel nameOfTerminalLabel, mainLabel;
 
     private final JComboBox<Ticket> ticketsBox;
 
     private final BackendLogic backendLogic;
+
+    private final JButton giveTicketButton;
 
     protected AbstractTerminalPanel(String nameOfTerminal, ApplicationContext applicationContext){
         Configuration.Properties properties = applicationContext.getBean("properties", Configuration.Properties.class);
@@ -30,26 +32,42 @@ public abstract class AbstractTerminalPanel extends JPanel {
         heightOfScreen = properties.getHeightOfScreen();
 
         ticketsBox = applicationContext.getBean("ticketsBox", JComboBox.class);
+        giveTicketButton = applicationContext.getBean("giveTicketButton", JButton.class);
         backendLogic = applicationContext.getBean(BackendLogic.class);
 
         setBounds(51, 0, properties.getWidthOfTerminal(),properties.getHeightOfTerminal());
 
         fontOfLabels = applicationContext.getBean("fontOfLabels", Font.class);
 
-        this.nameOfTerminalLabel = new Label();
+        this.nameOfTerminalLabel = new JLabel();
         this.nameOfTerminalLabel.setSize(new Dimension(110, indent - 1));
         this.nameOfTerminalLabel.setFont(fontOfLabels);
         this.nameOfTerminalLabel.setText(nameOfTerminal);
-        this.nameOfTerminalLabel.setAlignment(Label.CENTER);
+        this.nameOfTerminalLabel.setHorizontalAlignment(JLabel.CENTER);
+        this.nameOfTerminalLabel.setVerticalAlignment(JLabel.CENTER);
+
+        mainLabel = new JLabel();
+        mainLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 4));
+        mainLabel.setFont(getFontOfLabels());
+        mainLabel.setHorizontalAlignment(JLabel.CENTER);
+        mainLabel.setVerticalAlignment(JLabel.CENTER);
 
         nameOfTerminalLabel.setLocation((getWidth() - nameOfTerminalLabel.getWidth()) / 2, 1);
+        mainLabel.setLocation(
+                (getWidth() - mainLabel.getWidth()) / 2,
+                50
+        );
+
         add(nameOfTerminalLabel);
         add(ticketsBox);
+        add(mainLabel);
+        add(giveTicketButton);
 
         ticketsBox.setVisible(false);
 
         setLayout(null);
         setVisible(false);
+        giveTicketButton.setVisible(false);
 
         backendLogic.loadAllTickets(ticketsBox);
     }

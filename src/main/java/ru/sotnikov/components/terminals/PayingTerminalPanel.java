@@ -3,7 +3,6 @@ package ru.sotnikov.components.terminals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import ru.sotnikov.api.BackendLogic;
 import ru.sotnikov.util.TerminalException;
 import ru.sotnikov.util.Ticket;
 
@@ -13,8 +12,7 @@ import java.awt.event.ActionEvent;
 
 @Component("terminal2")
 public class PayingTerminalPanel extends AbstractTerminalPanel {
-    private final JLabel askToPayLabel;
-    private final Button askToTakeFineTicketButton, giveTicketButton, payButton;
+    private final Button askToTakeFineTicketButton, payButton;
 
     private int costOfParking;
     private Thread waitingPaymentThread;
@@ -23,12 +21,7 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
     public PayingTerminalPanel(ApplicationContext applicationContext){
         super("Терминал 2", applicationContext);
 
-        askToPayLabel = new JLabel();
-        askToPayLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 4));
-        askToPayLabel.setFont(getFontOfLabels());
-        askToPayLabel.setText("Приложите талончик");
-        askToPayLabel.setHorizontalAlignment(JLabel.CENTER);
-        askToPayLabel.setVerticalAlignment(JLabel.CENTER);
+        getMainLabel().setText("Приложите талончик");
 
         askToTakeFineTicketButton = new Button();
         askToTakeFineTicketButton.setSize(160, 50);
@@ -36,8 +29,7 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
         askToTakeFineTicketButton.setLabel("Потерял талон");
         askToTakeFineTicketButton.addActionListener(this::onTakingFineTicket);
 
-        giveTicketButton = applicationContext.getBean("giveTicketButton", Button.class);
-        giveTicketButton.addActionListener(this::onGivingTicket);
+        getGiveTicketButton().addActionListener(this::onGivingTicket);
 
         payButton = new Button();
         payButton.setSize(300, 50);
@@ -46,22 +38,16 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
         payButton.addActionListener(this::onPaying);
         payButton.setVisible(false);
 
-        askToPayLabel.setLocation(
-                (getWidth() - askToPayLabel.getWidth()) / 2,
-                50
-        );
         askToTakeFineTicketButton.setLocation(
                 (getWidth() - askToTakeFineTicketButton.getWidth()) / 2,
-                    askToPayLabel.getY() + askToPayLabel.getHeight() + getIndent() * 5
+                    getMainLabel().getY() + getMainLabel().getHeight() + getIndent() * 5
         );
         payButton.setLocation(
                 getWidth() - getIndent() - payButton.getWidth(),
                 getHeight() - getIndent() - payButton.getHeight()
         );
 
-        add(askToPayLabel);
         add(askToTakeFineTicketButton);
-        add(giveTicketButton);
         add(payButton);
 
         defaultState();
@@ -73,10 +59,10 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
                 Ticket ticket = getBackendLogic().getFineTicket();
                 getBackendLogic().addTicketToBox(ticket);
 
-                askToPayLabel.setText("Выдан штрафной талон " + ticket);
+                getMainLabel().setText("Выдан штрафной талон " + ticket);
                 askToTakeFineTicketButton.setVisible(false);
                 getTicketsBox().setEnabled(false);
-                giveTicketButton.setVisible(false);
+                getGiveTicketButton().setVisible(false);
                 Thread.sleep(2000);
                 defaultState();
             } catch (InterruptedException ignored) {}
@@ -85,14 +71,14 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
 
     private void onGivingTicket(ActionEvent actionEvent) {
         try{
-            askToPayLabel.setText("Производится расчет стоимости оплаты, подождите...");
-            giveTicketButton.setVisible(false);
+            getMainLabel().setText("Производится расчет стоимости оплаты, подождите...");
+            getGiveTicketButton().setVisible(false);
             askToTakeFineTicketButton.setVisible(false);
             costOfParking = getBackendLogic().getSumOfPayment((Ticket)getTicketsBox().getSelectedItem());
             getTicketsBox().setEnabled(false);
 
             if(costOfParking == 0){
-                askToPayLabel.setText("<html><p style=\"text-align:center\">Время бесплатной парковки " + getBackendLogic().getFreeTime() + " мин.,<br> оплата не требуется</p></html>");
+                getMainLabel().setText("<html><p style=\"text-align:center\">Время бесплатной парковки " + getBackendLogic().getFreeTime() + " мин.,<br> оплата не требуется</p></html>");
                 waitingPaymentThread = new Thread(() -> {
                     try {
                         Thread.sleep(3000);
@@ -104,7 +90,7 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
                 });
             }
             else{
-                askToPayLabel.setText("<html>К оплате: <br>" + costOfParking + " руб.</html>");
+                getMainLabel().setText("<html>К оплате: <br>" + costOfParking + " руб.</html>");
                 payButton.setVisible(true);
 
                 waitingPaymentThread = new Thread(() -> {
@@ -128,10 +114,10 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
             try{
                 waitingPaymentThread.interrupt();
                 payButton.setVisible(false);
-                askToPayLabel.setText("Обработка платежа, подождите...");
+                getMainLabel().setText("Обработка платежа, подождите...");
                 //Thread.sleep(2000);
                 getBackendLogic().pay(costOfParking, (Ticket)getTicketsBox().getSelectedItem(), "null");
-                askToPayLabel.setText(
+                getMainLabel().setText(
                         "<html>Талон " +
                                 (Ticket)getTicketsBox().getSelectedItem() +
                                 " оплачен,<br/> выезд возможен в течение " + getBackendLogic().getTimeOfLeaving() + " минут</html>"
@@ -150,14 +136,14 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
 
     public void defaultState(){
         try{
-            askToPayLabel.setText("<html><p style=\"text-align:center\">Приложите талончик<br>За утерю талончика штраф " + getBackendLogic().getFineCost() +" рублей</p></html>");
+            getMainLabel().setText("<html><p style=\"text-align:center\">Приложите талончик<br>За утерю талончика штраф " + getBackendLogic().getFineCost() +" рублей</p></html>");
         }
         catch (TerminalException e){
-            askToPayLabel.setText("Отсутствует подключение...");
+            getMainLabel().setText("Отсутствует подключение...");
         }
 
         askToTakeFineTicketButton.setVisible(true);
-        giveTicketButton.setVisible(true);
+        getGiveTicketButton().setVisible(true);
         getTicketsBox().setEnabled(true);
         payButton.setVisible(false);
         costOfParking = 0;

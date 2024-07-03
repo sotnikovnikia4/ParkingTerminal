@@ -33,7 +33,7 @@ public class Configuration {
     private final int heightOfButton;
     private final int yOfGiveTicketButton;
 
-    private final List<JComboBox<Ticket>> boxes;
+    public final static List<JComboBox<Ticket>> boxes = new ArrayList<>();
 
     @Autowired
     public Configuration(ApplicationContext applicationContext, @Value("${indent}") int indent, @Value("${heightOfTerminal}") int heightOfTerminal){
@@ -41,7 +41,6 @@ public class Configuration {
         heightOfButton = 50;
         this.indent = indent;
         yOfGiveTicketButton = heightOfTerminal - heightOfButton - indent;
-        this.boxes = new ArrayList<>();
     }
 
     @Bean("terminals")
@@ -74,27 +73,20 @@ public class Configuration {
                 yOfGiveTicketButton -  properties().indent - ticketsBox.getHeight()
         );
 
-        System.out.println(123);
-
         boxes.add(ticketsBox);
 
         return ticketsBox;
     }
 
-    @Bean("boxes")
-    public List<JComboBox<Ticket>> getBoxes(){
-        return boxes;
-    }
-
     @Bean("giveTicketButton")
     @Scope("prototype")
-    public Button giveTicketButton(
+    public JButton giveTicketButton(
             @Qualifier("fontOfLabels") Font font
     ){
-        Button giveTicketButton = new Button();
+        JButton giveTicketButton = new JButton();
         giveTicketButton.setSize(250, heightOfButton);
         giveTicketButton.setFont(font);
-        giveTicketButton.setLabel("Приложить талон");
+        giveTicketButton.setText("Приложить талон");
 
         giveTicketButton.setLocation(
                 properties().indent + 1,
