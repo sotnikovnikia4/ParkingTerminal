@@ -64,11 +64,15 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         add(stateOfGateLabel);
         add(takeTicketButton);
         add(driveToParkingButton);
+
+        defaultState();
     }
 
     private void onTakeTicket(ActionEvent e){
         try{
             Ticket ticket = backendLogic.takeTicket();
+
+            getTicketsBox().insertItemAt(ticket, 0);
 
             takeTicketButton.setVisible(false);
             takeTicketLabel.setText("Выдан талон " + ticket + ", проезжайте");
@@ -82,6 +86,10 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
     }
 
     private void onDrivingToParing(ActionEvent e){
+        defaultState();
+    }
+
+    private void defaultState(){
         takeTicketButton.setVisible(true);
         takeTicketLabel.setText("Возьмите талон");
         stateOfGateLabel.setText("Шлагбаум закрыт");

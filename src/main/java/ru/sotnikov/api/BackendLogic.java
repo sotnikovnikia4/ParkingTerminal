@@ -1,12 +1,12 @@
 package ru.sotnikov.api;
 
 import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.sotnikov.configuration.Configuration;
@@ -14,10 +14,9 @@ import ru.sotnikov.util.TerminalException;
 import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
-import java.net.ConnectException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Component("backendLogic")
 public class BackendLogic {
@@ -43,7 +42,6 @@ public class BackendLogic {
             String json = restTemplate.postForObject(url + "/ticket/enter", httpEntity, String.class);
 
             Ticket ticket = parseTicketFromJsonNode(objectMapper.readTree(json));
-            ticketsBox.insertItemAt(ticket, 0);
 
             return ticket;
         }
@@ -54,26 +52,26 @@ public class BackendLogic {
     }
 
     public int getSumOfPayment(Ticket ticket) {
-        try{
-            if(ticket == null){
-                throw new TerminalException("Не выбран талон, чтобы приложить");
-            }
-
-            return restTemplate.getForObject(url + "/ticket/cost/" + ticket.getNumber(), Integer.class);
-        }catch (NullPointerException | RestClientException e){
-            throw new TerminalException(e.getMessage());
+        if(ticket == null){
+            throw new TerminalException("Не выбран талон, чтобы приложить");
         }
 
+        return getIntegerFromUrl("/ticket/cost/" + ticket.getNumber());
     }
 
-    public void pay(int costOfParking, Ticket ticket, Object card) {
+    public void pay(int costOfParking, Ticket ticket, String card) throws TerminalException {
         try{
-//            Map<String, Object> parameters = Map.of(
-//                    "cost", costOfParking,
-//                    "ticket", ticket,
-//                    "card", card);
-//
-//            //String json = restTemplate.postForObject(url + "/ticket/pay/" + );
+            Map<String, Object> parameters = Map.of(
+                    "cost", costOfParking,
+                    "ticket", ticket.getNumber(),
+                    "card", card);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(parameters);
+
+            Boolean response = restTemplate.postForObject(url + "/ticket/pay", entity, Boolean.class);
+            if(response == null || !response){
+                throw new TerminalException("Оплата прошла неуспешно");
+            }
         }
         catch(NullPointerException | RestClientException e){
             throw new TerminalException(e.getMessage());
@@ -81,24 +79,27 @@ public class BackendLogic {
     }
 
     public int getTimeOfLeaving() {
-        return 10;
+        return getIntegerFromUrl("/ticket/exit-time");
     }
 
     public int getFineCost() {
+        return getIntegerFromUrl("/ticket/fine");
+    }
+
+    public Ticket getFineTicket() {
+
         try {
-            return restTemplate.getForObject(url + "/ticket/fine", Integer.class);
-        }
-        catch (NullPointerException | RestClientException e){
+            String json = restTemplate.postForObject(url + "/ticket/fine-ticket", "{}", String.class);
+            JsonNode node = objectMapper.readTree(json);
+
+            return parseTicketFromJsonNode(node);
+        } catch (NullPointerException | RestClientException | JsonProcessingException e) {
             throw new TerminalException(e.getMessage());
         }
     }
 
-    public Ticket getFineTicket() {
-        return null;
-    }
-
     public int getFreeTime() {
-        return 10;
+        return getIntegerFromUrl("/ticket/free-time");
     }
 
     private void loadAllTickets() throws TerminalException{
@@ -122,5 +123,12 @@ public class BackendLogic {
         ).build();
     }
 
-
+    private int getIntegerFromUrl(String url){
+        try {
+            return Objects.requireNonNull(restTemplate.getForObject(this.url + url, Integer.class));
+        }
+        catch (NullPointerException | RestClientException e){
+            throw new TerminalException(e.getMessage());
+        }
+    }
 }
