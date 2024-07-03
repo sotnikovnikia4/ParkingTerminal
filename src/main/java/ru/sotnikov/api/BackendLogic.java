@@ -86,6 +86,7 @@ public class BackendLogic {
                 for(int i = 0; i < box.getItemCount(); i++){
                     if(box.getItemAt(i).getNumber() == ticket.getNumber()){
                         box.getItemAt(i).setCheckIn(ticket.getCheckIn());
+                        box.getItemAt(i).setPaid(ticket.isPaid());
                     }
                 }
             }
@@ -108,7 +109,7 @@ public class BackendLogic {
         try {
             String json = restTemplate.postForObject(url + "/ticket/fine-ticket", "{}", String.class);
             JsonNode node = objectMapper.readTree(json);
-
+            System.out.println(json);
             return parseTicketFromJsonNode(node);
         } catch (NullPointerException | RestClientException | JsonProcessingException e) {
             throw new TerminalException(e.getMessage());
@@ -161,7 +162,8 @@ public class BackendLogic {
                 node.get("id").asInt()
         ).checkIn(
                 LocalDateTime.parse(node.get("entryTime").asText())
-        ).build();
+        )
+                .paid(!node.get("payTime").asText().equals("null")).build();
     }
 
     private int getIntegerFromUrl(String url){

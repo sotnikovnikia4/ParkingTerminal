@@ -11,8 +11,15 @@ import java.time.LocalDateTime;
 public class Ticket {
     private int number;
     private LocalDateTime checkIn;
+    private boolean paid;
+
+    private static final LocalDateTime MIN = LocalDateTime.parse("1971-01-01T00:00:00");
 
     public String toString(){
+        if(checkIn.isEqual(MIN)){
+            return String.format("%d: Штрафной талон", number);
+        }
+
         return String.format("%d: %d-%d-%d, %d:%s", number,
                 checkIn.getYear(),
                 checkIn.getMonthValue(),

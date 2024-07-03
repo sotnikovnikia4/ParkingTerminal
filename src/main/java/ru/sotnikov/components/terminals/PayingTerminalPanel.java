@@ -9,6 +9,7 @@ import ru.sotnikov.util.Ticket;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 @Component("terminal2")
 public class PayingTerminalPanel extends AbstractTerminalPanel {
@@ -78,7 +79,13 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
             getTicketsBox().setEnabled(false);
 
             if(costOfParking == 0){
-                getMainLabel().setText("<html><p style=\"text-align:center\">Время бесплатной парковки " + getBackendLogic().getFreeTime() + " мин.,<br> оплата не требуется</p></html>");
+                if(((Ticket) Objects.requireNonNull(getTicketsBox().getSelectedItem())).isPaid()){
+                    getMainLabel().setText("<html><p style=\"text-align:center\">Талон "+ getTicketsBox().getSelectedItem() +" уже оплачен<br/> пройдите к терминалу 3</p></html>");
+                }
+                else{
+                    getMainLabel().setText("<html><p style=\"text-align:center\">Время бесплатной парковки " + getBackendLogic().getFreeTime() + " мин.,<br> оплата не требуется</p></html>");
+                }
+
                 waitingPaymentThread = new Thread(() -> {
                     try {
                         Thread.sleep(3000);
