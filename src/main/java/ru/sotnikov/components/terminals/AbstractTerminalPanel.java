@@ -9,6 +9,7 @@ import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 @Getter(AccessLevel.PROTECTED)
 public abstract class AbstractTerminalPanel extends JPanel {
@@ -26,8 +27,10 @@ public abstract class AbstractTerminalPanel extends JPanel {
 
     private final JButton giveTicketButton;
 
+    private final  Configuration.Properties properties;
+
     protected AbstractTerminalPanel(String nameOfTerminal, ApplicationContext applicationContext){
-        Configuration.Properties properties = applicationContext.getBean("properties", Configuration.Properties.class);
+        properties = applicationContext.getBean("properties", Configuration.Properties.class);
         indent = properties.getIndent();
         heightOfScreen = properties.getHeightOfScreen();
 
@@ -47,7 +50,7 @@ public abstract class AbstractTerminalPanel extends JPanel {
         this.nameOfTerminalLabel.setVerticalAlignment(JLabel.CENTER);
 
         mainLabel = new JLabel();
-        mainLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 4));
+        mainLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 6));
         mainLabel.setFont(getFontOfLabels());
         mainLabel.setHorizontalAlignment(JLabel.CENTER);
         mainLabel.setVerticalAlignment(JLabel.CENTER);
@@ -78,4 +81,33 @@ public abstract class AbstractTerminalPanel extends JPanel {
         g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         g.drawRect(indent, indent, getWidth() - indent * 2, heightOfScreen);
     }
+
+    protected final void doSomeAndHandleExceptionInOtherThread(Runnable tryAction){
+        try{
+            tryAction.run();
+        }catch(RuntimeException e){
+            new Thread(() -> {
+                StringBuilder sb = new StringBuilder();
+                sb.append("<html><p style=\"text-align: center\">");
+                int b = 50;
+                for(int i = 0; i < e.getMessage().length(); i += b){
+                    sb.append(e.getMessage(), i, Math.min(e.getMessage().length(), i + b));
+                    sb.append("<br/>");
+                }
+                sb.append("</html>");
+
+                getMainLabel().setText(sb.toString());
+
+                try {
+                    Thread.sleep(properties.getTimeOfVisibilityError());
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                defaultState();
+            }).start();
+        }
+    }
+
+    protected abstract void defaultState();
 }

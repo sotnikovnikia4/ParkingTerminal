@@ -59,26 +59,23 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
     }
 
     private void onTakeTicket(ActionEvent e){
-        try{
-            Ticket ticket = getBackendLogic().takeTicket();
+        doSomeAndHandleExceptionInOtherThread(() -> {
+            takeTicketButton.setVisible(false);
 
+            Ticket ticket = getBackendLogic().takeTicket();
             getBackendLogic().addTicketToBox(ticket);
 
-            takeTicketButton.setVisible(false);
             getMainLabel().setText("Выдан талон " + ticket + ", проезжайте");
             stateOfGateLabel.setText("Шлагбаум открыт");
             driveToParkingButton.setVisible(true);
-        }catch(TerminalException ex){
-            JOptionPane.showMessageDialog(null, ex.getMessage());
-            defaultState();
-        }
+        });
     }
 
     private void onDrivingToParking(ActionEvent e){
         defaultState();
     }
 
-    private void defaultState(){
+    protected void defaultState(){
         takeTicketButton.setVisible(true);
         getMainLabel().setText("Возьмите талон");
         stateOfGateLabel.setText("Шлагбаум закрыт");

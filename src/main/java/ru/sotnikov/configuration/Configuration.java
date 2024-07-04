@@ -128,5 +128,7 @@ public class Configuration {
         private int startTerminal;
         @Value("${urlBackend}")
         private String urlBackend;
+        @Value("${timeOfVisibilityError}")
+        private int timeOfVisibilityError;
     }
 }

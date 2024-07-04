@@ -56,22 +56,29 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
 
     private void onTakingFineTicket(ActionEvent actionEvent) {
         new Thread(() -> {
-            try {
+            doSomeAndHandleExceptionInOtherThread(() -> {
+                askToTakeFineTicketButton.setVisible(false);
+                getTicketsBox().setEnabled(false);
+                getGiveTicketButton().setVisible(false);
+
                 Ticket ticket = getBackendLogic().getFineTicket();
                 getBackendLogic().addTicketToBox(ticket);
 
                 getMainLabel().setText("Выдан штрафной талон " + ticket);
-                askToTakeFineTicketButton.setVisible(false);
-                getTicketsBox().setEnabled(false);
-                getGiveTicketButton().setVisible(false);
-                Thread.sleep(2000);
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
                 defaultState();
-            } catch (InterruptedException ignored) {}
+            });
         }).start();
     }
 
     private void onGivingTicket(ActionEvent actionEvent) {
-        try{
+        doSomeAndHandleExceptionInOtherThread(() -> {
             getMainLabel().setText("Производится расчет стоимости оплаты, подождите...");
             getGiveTicketButton().setVisible(false);
             askToTakeFineTicketButton.setVisible(false);
@@ -109,39 +116,34 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
             }
 
             waitingPaymentThread.start();
-        }
-        catch(TerminalException e){
-            JOptionPane.showMessageDialog(null, e.getMessage());
-            defaultState();
-        }
+        });
     }
 
     private void onPaying(ActionEvent actionEvent) {
         new Thread(() -> {
-            try{
+            doSomeAndHandleExceptionInOtherThread(() -> {
                 waitingPaymentThread.interrupt();
                 payButton.setVisible(false);
                 getMainLabel().setText("Обработка платежа, подождите...");
-                //Thread.sleep(2000);
                 getBackendLogic().pay(costOfParking, (Ticket)getTicketsBox().getSelectedItem(), "null");
                 getMainLabel().setText(
                         "<html>Талон " +
                                 (Ticket)getTicketsBox().getSelectedItem() +
                                 " оплачен,<br/> выезд возможен в течение " + getBackendLogic().getTimeOfLeaving() + " минут</html>"
                 );
-                Thread.sleep(3000);
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
                 defaultState();
-            }
-            catch(TerminalException e){
-                JOptionPane.showMessageDialog(null, e.getMessage());
-                defaultState();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            });
         }).start();
     }
 
-    public void defaultState(){
+    protected void defaultState(){
         try{
             getMainLabel().setText("<html><p style=\"text-align:center\">Приложите талончик<br>За утерю талончика штраф " + getBackendLogic().getFineCost() +" рублей</p></html>");
         }

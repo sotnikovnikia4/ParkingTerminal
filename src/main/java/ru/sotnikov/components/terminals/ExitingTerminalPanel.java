@@ -51,7 +51,7 @@ public class ExitingTerminalPanel extends AbstractTerminalPanel {
     }
 
     private void onGivingTicket(ActionEvent actionEvent) {
-        try{
+        doSomeAndHandleExceptionInOtherThread(() -> {
             getGiveTicketButton().setVisible(false);
             getTicketsBox().setEnabled(false);
 
@@ -61,17 +61,14 @@ public class ExitingTerminalPanel extends AbstractTerminalPanel {
             getMainLabel().setText("Талон оплачен, проезжайте");
             stateOfGateLabel.setText("Шлагбаум открыт");
             driveOutToParkingButton.setVisible(true);
-        }catch(TerminalException ex){
-            JOptionPane.showMessageDialog(null, ex.getMessage());
-            defaultState();
-        }
+        });
     }
 
     private void onDrivingOutToParking(ActionEvent actionEvent) {
         defaultState();
     }
 
-    private void defaultState(){
+    protected void defaultState(){
         getTicketsBox().setVisible(true);
         getTicketsBox().setEnabled(true);
         driveOutToParkingButton.setVisible(false);
