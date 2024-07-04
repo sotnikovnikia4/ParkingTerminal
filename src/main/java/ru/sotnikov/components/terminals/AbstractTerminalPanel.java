@@ -89,15 +89,13 @@ public abstract class AbstractTerminalPanel extends JPanel {
         g.fillRect(0, getHeight() - indent, getWidth(), indent);
         g.fillRect(0, indent + heightOfScreen, getWidth(), indent);
 
-        g.setColor(new Color(43, 46, 44));
-        g.fillRect(indent, indent * 2 + heightOfScreen, getWidth() - indent * 2, getHeight() - indent * 3 - heightOfScreen);
+        //g.setColor(new Color(43, 46, 44));
+        //g.fillRect(indent, indent * 2 + heightOfScreen, getWidth() - indent * 2, getHeight() - indent * 3 - heightOfScreen);
 
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         g.drawRect(indent, indent, getWidth() - indent * 2, heightOfScreen);
         g.drawRect(indent, indent * 2 + heightOfScreen, getWidth() - indent * 2, getHeight() - indent * 3 - heightOfScreen);
-
-        Arrays.stream(getComponents()).forEach(Component::repaint);
     }
 
     protected final void doSomeAndHandleExceptionInOtherThread(Runnable tryAction){
