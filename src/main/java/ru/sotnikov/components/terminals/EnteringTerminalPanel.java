@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
 public class EnteringTerminalPanel extends AbstractTerminalPanel {
     private final Label stateOfGateLabel;
 
-    private final Button takeTicketButton, driveToParkingButton;
+    private final JButton takeTicketButton, driveToParkingButton;
 
     @Autowired
     public EnteringTerminalPanel(ApplicationContext applicationContext){
@@ -29,16 +29,16 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         stateOfGateLabel.setText("Шлагбаум закрыт");
         stateOfGateLabel.setAlignment(Label.CENTER);
 
-        takeTicketButton = new Button();
-        takeTicketButton.setSize(160, 50);
+        takeTicketButton = new JButton();
+        takeTicketButton.setSize(250, 50);
         takeTicketButton.setFont(getFontOfLabels());
-        takeTicketButton.setLabel("Получить талон");
+        takeTicketButton.setText("Получить талон");
         takeTicketButton.addActionListener(this::onTakeTicket);
 
-        driveToParkingButton = new Button();
-        driveToParkingButton.setSize(160, 50);
+        driveToParkingButton = new JButton();
+        driveToParkingButton.setSize(250, 50);
         driveToParkingButton.setFont(getFontOfLabels());
-        driveToParkingButton.setLabel("Заехать");
+        driveToParkingButton.setText("Заехать");
         driveToParkingButton.addActionListener(this::onDrivingToParking);
         driveToParkingButton.setVisible(false);
 
