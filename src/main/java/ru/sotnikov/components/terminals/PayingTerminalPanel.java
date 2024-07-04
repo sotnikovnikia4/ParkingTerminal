@@ -13,7 +13,7 @@ import java.util.Objects;
 
 @Component("terminal2")
 public class PayingTerminalPanel extends AbstractTerminalPanel {
-    private final Button askToTakeFineTicketButton, payButton;
+    private final JButton askToTakeFineTicketButton, payButton;
 
     private int costOfParking;
     private Thread waitingPaymentThread;
@@ -24,18 +24,18 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
 
         getMainLabel().setText("Приложите талончик");
 
-        askToTakeFineTicketButton = new Button();
-        askToTakeFineTicketButton.setSize(160, 50);
+        askToTakeFineTicketButton = new JButton();
+        askToTakeFineTicketButton.setSize(200, 50);
         askToTakeFineTicketButton.setFont(getFontOfLabels());
-        askToTakeFineTicketButton.setLabel("Потерял талон");
+        askToTakeFineTicketButton.setText("Потерял талон");
         askToTakeFineTicketButton.addActionListener(this::onTakingFineTicket);
 
         getGiveTicketButton().addActionListener(this::onGivingTicket);
 
-        payButton = new Button();
-        payButton.setSize(300, 50);
+        payButton = new JButton();
+        payButton.setSize(400, 50);
         payButton.setFont(getFontOfLabels());
-        payButton.setLabel("Приложить карту для оплаты");
+        payButton.setText("Приложить карту для оплаты");
         payButton.addActionListener(this::onPaying);
         payButton.setVisible(false);
 
@@ -129,7 +129,7 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
                                 (Ticket)getTicketsBox().getSelectedItem() +
                                 " оплачен,<br/> выезд возможен в течение " + getBackendLogic().getTimeOfLeaving() + " минут</html>"
                 );
-                Thread.sleep(5000);
+                Thread.sleep(3000);
                 defaultState();
             }
             catch(TerminalException e){
