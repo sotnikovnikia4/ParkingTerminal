@@ -23,12 +23,7 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
 
         getMainLabel().setText("Возьмите талон");
 
-        stateOfGateLabel = new JLabel();
-        stateOfGateLabel.setSize(new Dimension(getWidth() / 2, getIndent() * 2));
-        stateOfGateLabel.setFont(getFontOfLabels());
-        stateOfGateLabel.setText("Шлагбаум закрыт");
-        stateOfGateLabel.setVerticalAlignment(JLabel.CENTER);
-        stateOfGateLabel.setHorizontalAlignment(JLabel.CENTER);
+        stateOfGateLabel = applicationContext.getBean("stateOfGateLabel", JLabel.class);
 
         takeTicketButton = new JButton();
         takeTicketButton.setSize(250, 50);
@@ -43,7 +38,6 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         driveToParkingButton.addActionListener(this::onDrivingToParking);
         driveToParkingButton.setVisible(false);
 
-        stateOfGateLabel.setLocation((getWidth() - stateOfGateLabel.getWidth()) / 2, getIndent() + getHeightOfScreen() - stateOfGateLabel.getHeight() - 40);
         takeTicketButton.setLocation(
                 (getWidth() - takeTicketButton.getWidth()) / 2,
                 getMainLabel().getY() + getMainLabel().getHeight() + 1 + (stateOfGateLabel.getY() - (getMainLabel().getY() + getMainLabel().getHeight() + 1) - takeTicketButton.getHeight()) / 2

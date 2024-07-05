@@ -1,11 +1,15 @@
-package ru.sotnikov.components.window;
+package ru.sotnikov.components.buttons;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-//@Component("buttonPrev")
+@Component("changeTerminalButton")
+@Scope("prototype")
 public class MyButton extends Button {
-
     public MyButton(String text, ActionListener listener){
         int size = 50;
 

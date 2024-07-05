@@ -1,21 +1,22 @@
 package ru.sotnikov.components.window;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import ru.sotnikov.components.buttons.MyButton;
 import ru.sotnikov.configuration.Configuration;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Arrays;
 
 @Component("panel")
 public class MainPanel extends JPanel {
 
     private Button buttonNext, buttonPrev;
-    private JPanel[] terminals;
+    private final JPanel[] terminals;
     private int currentTerminal;
 
     @Autowired
@@ -26,8 +27,8 @@ public class MainPanel extends JPanel {
         setPreferredSize(sizeOfPanel);
         setSize(sizeOfPanel);
 
-        this.buttonNext = new MyButton(">", this::nextTerminal);
-        this.buttonPrev = new MyButton("<", this::prevTerminal);
+        this.buttonNext = applicationContext.getBean(MyButton.class, ">", (ActionListener) this::nextTerminal);
+        this.buttonPrev = applicationContext.getBean(MyButton.class, "<", (ActionListener) this::prevTerminal);
         buttonNext.setLocation(this.getWidth() - buttonNext.getWidth(), (this.getHeight() - buttonNext.getHeight()) / 2);
         buttonPrev.setLocation(0, (this.getHeight() - buttonPrev.getHeight()) / 2);
 

@@ -23,12 +23,7 @@ public class ExitingTerminalPanel extends AbstractTerminalPanel {
 
         getGiveTicketButton().addActionListener(this::onGivingTicket);
 
-        stateOfGateLabel = new JLabel();
-        stateOfGateLabel.setSize(new Dimension(getWidth() / 2, getIndent() * 2));
-        stateOfGateLabel.setFont(getFontOfLabels());
-        stateOfGateLabel.setText("Шлагбаум закрыт");
-        stateOfGateLabel.setHorizontalAlignment(JLabel.CENTER);
-        stateOfGateLabel.setVerticalAlignment(JLabel.CENTER);
+        stateOfGateLabel = applicationContext.getBean("stateOfGateLabel", JLabel.class);
 
         driveOutToParkingButton = new JButton();
         driveOutToParkingButton.setSize(160, 50);
@@ -41,7 +36,6 @@ public class ExitingTerminalPanel extends AbstractTerminalPanel {
                 (getWidth() - getIndent() * 2 - driveOutToParkingButton.getWidth()),
                 getHeight() - driveOutToParkingButton.getHeight() - getIndent() * 2
         );
-        stateOfGateLabel.setLocation((getWidth() - stateOfGateLabel.getWidth()) / 2, getIndent() + getHeightOfScreen() - stateOfGateLabel.getHeight() - 40);
 
         add(driveOutToParkingButton);
         add(stateOfGateLabel);
@@ -60,6 +54,7 @@ public class ExitingTerminalPanel extends AbstractTerminalPanel {
             getMainLabel().setText("Талон оплачен, проезжайте");
             stateOfGateLabel.setText("Шлагбаум открыт");
             driveOutToParkingButton.setVisible(true);
+            stateOfGateLabel.setForeground(new Color(75, 201, 96));
         });
     }
 
@@ -74,5 +69,6 @@ public class ExitingTerminalPanel extends AbstractTerminalPanel {
         stateOfGateLabel.setText("Шлагбаум закрыт");
         getMainLabel().setText("Приложите талончик");
         getGiveTicketButton().setVisible(true);
+        stateOfGateLabel.setForeground(Color.red);
     }
 }
