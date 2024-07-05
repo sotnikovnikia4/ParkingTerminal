@@ -9,6 +9,7 @@ import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 @Getter(AccessLevel.PROTECTED)
@@ -43,11 +44,12 @@ public abstract class AbstractTerminalPanel extends JPanel {
         fontOfLabels = applicationContext.getBean("fontOfLabels", Font.class);
 
         this.nameOfTerminalLabel = new JLabel();
-        this.nameOfTerminalLabel.setSize(new Dimension(110, indent - 1));
+        this.nameOfTerminalLabel.setSize(new Dimension(getWidth(), indent - 1));
         this.nameOfTerminalLabel.setFont(fontOfLabels);
         this.nameOfTerminalLabel.setText(nameOfTerminal);
         this.nameOfTerminalLabel.setHorizontalAlignment(JLabel.CENTER);
         this.nameOfTerminalLabel.setVerticalAlignment(JLabel.CENTER);
+        this.nameOfTerminalLabel.setForeground(new Color(230, 247, 233));
 
         mainLabel = new JLabel();
         mainLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 6));
@@ -61,11 +63,6 @@ public abstract class AbstractTerminalPanel extends JPanel {
                 50
         );
 
-        add(nameOfTerminalLabel);
-        add(ticketsBox);
-        add(mainLabel);
-        add(giveTicketButton);
-
         ticketsBox.setVisible(false);
 
         setLayout(null);
@@ -73,13 +70,36 @@ public abstract class AbstractTerminalPanel extends JPanel {
         giveTicketButton.setVisible(false);
 
         backendLogic.loadAllTickets(ticketsBox);
+        add(ticketsBox);
+        add(mainLabel);
+        add(giveTicketButton);
+        add(nameOfTerminalLabel);
     }
 
     @Override
-    public void paint(Graphics g) {
-        super.paint(g);
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        g.setColor(new Color(173, 72, 9));
+        g.fillRect(0, 0, indent, getHeight());
+        g.fillRect(getWidth() - indent, 0, indent, getHeight());
+        g.fillRect(0, 0, getWidth(), indent);
+        g.fillRect(0, getHeight() - indent, getWidth(), indent);
+        g.fillRect(0, indent + heightOfScreen, getWidth(), indent);
+
+        g.setColor(new Color(43, 46, 44));
+        g.fillRect(indent, indent * 2 + heightOfScreen, getWidth() - indent * 2, getHeight() - indent * 3 - heightOfScreen);
+
+        g.setColor(Color.BLACK);
         g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         g.drawRect(indent, indent, getWidth() - indent * 2, heightOfScreen);
+        g.drawRect(indent, indent * 2 + heightOfScreen, getWidth() - indent * 2, getHeight() - indent * 3 - heightOfScreen);
+
+//        Arrays.stream(getComponents()).forEach(e -> {
+//            if(e.isVisible() && e instanceof JLabel){
+//                e.repaint();
+//            }
+//        });
     }
 
     protected final void doSomeAndHandleExceptionInOtherThread(Runnable tryAction){
