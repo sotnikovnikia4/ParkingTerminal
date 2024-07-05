@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
 
 @Component("terminal1")
 public class EnteringTerminalPanel extends AbstractTerminalPanel {
-    private final Label stateOfGateLabel;
+    private final JLabel stateOfGateLabel;
 
     private final JButton takeTicketButton, driveToParkingButton;
 
@@ -23,11 +23,12 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
 
         getMainLabel().setText("Возьмите талон");
 
-        stateOfGateLabel = new Label();
+        stateOfGateLabel = new JLabel();
         stateOfGateLabel.setSize(new Dimension(getWidth() / 2, getIndent() * 2));
         stateOfGateLabel.setFont(getFontOfLabels());
         stateOfGateLabel.setText("Шлагбаум закрыт");
-        stateOfGateLabel.setAlignment(Label.CENTER);
+        stateOfGateLabel.setVerticalAlignment(JLabel.CENTER);
+        stateOfGateLabel.setHorizontalAlignment(JLabel.CENTER);
 
         takeTicketButton = new JButton();
         takeTicketButton.setSize(250, 50);
@@ -49,7 +50,7 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         );
         driveToParkingButton.setLocation(
                 (getWidth() - driveToParkingButton.getWidth()) / 2,
-                getHeight() - driveToParkingButton.getHeight() - 20
+                getHeight() - driveToParkingButton.getHeight() - getIndent() * 2
         );
         add(stateOfGateLabel);
         add(takeTicketButton);
@@ -68,6 +69,7 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
             getMainLabel().setText("Выдан талон " + ticket + ", проезжайте");
             stateOfGateLabel.setText("Шлагбаум открыт");
             driveToParkingButton.setVisible(true);
+            stateOfGateLabel.setForeground(new Color(75, 201, 96));
         });
     }
 
@@ -80,5 +82,6 @@ public class EnteringTerminalPanel extends AbstractTerminalPanel {
         getMainLabel().setText("Возьмите талон");
         stateOfGateLabel.setText("Шлагбаум закрыт");
         driveToParkingButton.setVisible(false);
+        stateOfGateLabel.setForeground(Color.red);
     }
 }

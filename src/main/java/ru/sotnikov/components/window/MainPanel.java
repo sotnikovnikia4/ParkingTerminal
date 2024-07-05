@@ -34,7 +34,7 @@ public class MainPanel extends JPanel {
 
         this.terminals = applicationContext.getBean("terminals", JPanel[].class);
         for(JPanel terminalPanel : terminals){
-            terminalPanel.setLocation((getWidth() - terminalPanel.getWidth()) / 2, 0);
+            terminalPanel.setLocation((getWidth() - terminalPanel.getWidth()) / 2, (getHeight() - terminalPanel.getHeight()) / 2);
         }
         this.currentTerminal = properties.getStartTerminal() - 1;
 

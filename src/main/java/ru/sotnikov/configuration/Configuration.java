@@ -40,7 +40,7 @@ public class Configuration {
         this.applicationContext = applicationContext;
         heightOfButton = 50;
         this.indent = indent;
-        yOfGiveTicketButton = heightOfTerminal - heightOfButton - indent;
+        yOfGiveTicketButton = heightOfTerminal - heightOfButton - indent * 2;
     }
 
     @Bean("terminals")
@@ -69,7 +69,7 @@ public class Configuration {
         ticketsBox.setFont(font);
         ticketsBox.setEditable(true);
         ticketsBox.setLocation(
-                properties().indent + 1,
+                properties().indent * 2 + 1,
                 yOfGiveTicketButton -  properties().indent - ticketsBox.getHeight()
         );
 
@@ -89,7 +89,7 @@ public class Configuration {
         giveTicketButton.setText("Приложить талон");
 
         giveTicketButton.setLocation(
-                properties().indent + 1,
+                properties().indent * 2 + 1,
                 yOfGiveTicketButton
         );
         return giveTicketButton;

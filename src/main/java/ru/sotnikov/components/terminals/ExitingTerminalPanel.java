@@ -3,7 +3,6 @@ package ru.sotnikov.components.terminals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import ru.sotnikov.util.TerminalException;
 import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
@@ -14,7 +13,7 @@ import java.awt.event.ActionEvent;
 public class ExitingTerminalPanel extends AbstractTerminalPanel {
     private final JLabel stateOfGateLabel;
 
-    private final Button driveOutToParkingButton;
+    private final JButton driveOutToParkingButton;
 
     @Autowired
     public ExitingTerminalPanel(ApplicationContext applicationContext){
@@ -31,16 +30,16 @@ public class ExitingTerminalPanel extends AbstractTerminalPanel {
         stateOfGateLabel.setHorizontalAlignment(JLabel.CENTER);
         stateOfGateLabel.setVerticalAlignment(JLabel.CENTER);
 
-        driveOutToParkingButton = new Button();
+        driveOutToParkingButton = new JButton();
         driveOutToParkingButton.setSize(160, 50);
         driveOutToParkingButton.setFont(getFontOfLabels());
-        driveOutToParkingButton.setLabel("Выехать");
+        driveOutToParkingButton.setText("Выехать");
         driveOutToParkingButton.addActionListener(this::onDrivingOutToParking);
         driveOutToParkingButton.setVisible(false);
 
         driveOutToParkingButton.setLocation(
-                (getWidth() - getIndent() - driveOutToParkingButton.getWidth()),
-                getHeight() - driveOutToParkingButton.getHeight() - 20
+                (getWidth() - getIndent() * 2 - driveOutToParkingButton.getWidth()),
+                getHeight() - driveOutToParkingButton.getHeight() - getIndent() * 2
         );
         stateOfGateLabel.setLocation((getWidth() - stateOfGateLabel.getWidth()) / 2, getIndent() + getHeightOfScreen() - stateOfGateLabel.getHeight() - 40);
 

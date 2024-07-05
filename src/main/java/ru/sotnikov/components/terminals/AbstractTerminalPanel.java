@@ -9,8 +9,6 @@ import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.function.Consumer;
 
 @Getter(AccessLevel.PROTECTED)
 public abstract class AbstractTerminalPanel extends JPanel {
@@ -51,6 +49,7 @@ public abstract class AbstractTerminalPanel extends JPanel {
         this.nameOfTerminalLabel.setVerticalAlignment(JLabel.CENTER);
         this.nameOfTerminalLabel.setForeground(new Color(230, 247, 233));
 
+
         mainLabel = new JLabel();
         mainLabel.setSize(new Dimension((int)(getWidth() / 1.1), getIndent() * 6));
         mainLabel.setFont(getFontOfLabels());
@@ -81,25 +80,18 @@ public abstract class AbstractTerminalPanel extends JPanel {
         super.paintComponent(g);
 
         g.setColor(new Color(173, 72, 9));
-        g.fillRect(0, 0, indent, getHeight());
-        g.fillRect(getWidth() - indent, 0, indent, getHeight());
-        g.fillRect(0, 0, getWidth(), indent);
-        g.fillRect(0, getHeight() - indent, getWidth(), indent);
-        g.fillRect(0, indent + heightOfScreen, getWidth(), indent);
+        g.fillRect(0, 0, getWidth(), getHeight());
 
         g.setColor(new Color(43, 46, 44));
         g.fillRect(indent, indent * 2 + heightOfScreen, getWidth() - indent * 2, getHeight() - indent * 3 - heightOfScreen);
+
+        g.setColor(new Color(209, 234, 237));
+        g.fillRect(indent, indent, getWidth() - indent * 2, getHeightOfScreen());
 
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         g.drawRect(indent, indent, getWidth() - indent * 2, heightOfScreen);
         g.drawRect(indent, indent * 2 + heightOfScreen, getWidth() - indent * 2, getHeight() - indent * 3 - heightOfScreen);
-
-//        Arrays.stream(getComponents()).forEach(e -> {
-//            if(e.isVisible() && e instanceof JLabel){
-//                e.repaint();
-//            }
-//        });
     }
 
     protected final void doSomeAndHandleExceptionInOtherThread(Runnable tryAction){

@@ -7,7 +7,6 @@ import ru.sotnikov.util.TerminalException;
 import ru.sotnikov.util.Ticket;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Objects;
 
@@ -44,8 +43,8 @@ public class PayingTerminalPanel extends AbstractTerminalPanel {
                     getMainLabel().getY() + getMainLabel().getHeight() + getIndent() * 5
         );
         payButton.setLocation(
-                getWidth() - getIndent() - payButton.getWidth(),
-                getHeight() - getIndent() - payButton.getHeight()
+                getWidth() - getIndent() * 2 - payButton.getWidth(),
+                getHeight() - getIndent() * 2 - payButton.getHeight()
         );
 
         add(askToTakeFineTicketButton);
